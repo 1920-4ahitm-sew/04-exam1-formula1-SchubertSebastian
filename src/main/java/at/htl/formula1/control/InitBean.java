@@ -10,11 +10,10 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Initialized;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Transient;
+import javax.lang.model.type.NullType;
+import javax.persistence.*;
 import javax.transaction.Transactional;
+import javax.validation.constraints.Null;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -32,6 +31,7 @@ import static java.lang.Integer.parseInt;
 import static java.time.LocalDate.parse;
 
 @ApplicationScoped
+@Transactional
 public class InitBean {
 
     private static final String TEAM_FILE_NAME = "teams.csv";
@@ -44,7 +44,7 @@ public class InitBean {
     ResultsRestClient client;
 
     @Transient
-    public void init(@Observes @Initialized(ApplicationScoped.class) Object init) {
+    public void init(@Observes @Initialized(ApplicationScoped.class) Object init)  {
 
         readTeamsAndDriversFromFile(TEAM_FILE_NAME);
         readRacesFromFile(RACES_FILE_NAME);
@@ -80,7 +80,11 @@ public class InitBean {
                 LocalDate localDate = LocalDate.parse(arr[2], formatter);
                 Race race = new Race(Long.parseLong(arr[0]),arr[1], localDate);
 
+
+                //em.getTransaction().begin();
+
                 em.persist(race);
+                //em.getTransaction().commit();
                 //em.persist(new Race(Long.parseLong(arr[0]),arr[1], localDate));
                 //System.out.println(race);
             }
@@ -110,12 +114,15 @@ public class InitBean {
 
                 String[] arr= line.split(delim);
 
+                persistTeamAndDrivers(arr);
+
+                /*
                 System.out.println(arr[0]);
                 System.out.print(arr[1]);
                 System.out.print("|" + arr[2]);
 
-                //em.persist(new Race(Long.parseLong(arr[0]),arr[1], LocalDate.parse(arr[2])));
-
+                em.persist(new Race(Long.parseLong(arr[0]),arr[1], LocalDate.parse(arr[2])));
+                */
                 //Driver race = new Driver(arr[1],Integer.getInteger(arr[2]));
                 //System.out.println(race);
             }
@@ -138,6 +145,18 @@ public class InitBean {
      */
 
     private void persistTeamAndDrivers(String[] line) {
+
+        Team team = new Team(line[0]);
+
+        int teamFound = em.createNamedQuery("Team.findTeam", Team.class).setParameter("NAME", team.getName()).getFirstResult();
+        System.out.println(teamFound);
+
+        if(teamFound == 0) {
+            em.persist(team);
+            em.persist(new Driver(line[1], team));em.persist(new Driver(line[2], team));
+        }
+
+
 
     }
 
