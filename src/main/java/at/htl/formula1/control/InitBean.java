@@ -152,8 +152,10 @@ public class InitBean {
         System.out.println(teamFound);
 
         if(teamFound == 0) {
+            System.out.println("hi");
             em.persist(team);
-            em.persist(new Driver(line[1], team));em.persist(new Driver(line[2], team));
+            em.persist(new Driver(line[1], team));
+            em.persist(new Driver(line[2], team));
         }
 
 
