@@ -8,6 +8,7 @@ import javax.persistence.*;
  * The id's are assigned by the database.
  */
 @Entity
+@Table(name = "F1_TEAM")
 public class Team {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
