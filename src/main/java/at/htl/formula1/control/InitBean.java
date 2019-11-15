@@ -4,6 +4,7 @@ import at.htl.formula1.boundary.ResultsRestClient;
 import at.htl.formula1.entity.Driver;
 import at.htl.formula1.entity.Race;
 import at.htl.formula1.entity.Team;
+import org.w3c.dom.ls.LSOutput;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Initialized;
@@ -13,11 +14,15 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.stream.Stream;
@@ -49,7 +54,30 @@ public class InitBean {
      * @param racesFileName
      */
     private void readRacesFromFile(String racesFileName) {
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream( "/"+racesFileName)));
+            br.readLine();
+            String line;
+            while ((line = br.readLine()) != null) {
+                //System.out.println(line);
+                String delim = "\\;";
 
+                String[] arr= line.split(delim);
+
+                System.out.println(arr[0]);
+                System.out.println(arr[1]);
+                System.out.println(arr[2]);
+
+                //em.persist(new Race(Long.parseLong(arr[0]),arr[1], LocalDate.parse(arr[2])));
+
+                //Race race = new Race(Long.parseLong(arr[0]),arr[1], LocalDate.parse(arr[2]));
+                //System.out.println(race);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
