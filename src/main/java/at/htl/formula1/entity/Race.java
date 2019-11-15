@@ -1,6 +1,7 @@
 package at.htl.formula1.entity;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.time.LocalDate;
@@ -13,6 +14,7 @@ import java.time.LocalDate;
 @Entity
 public class Race {
 
+    @Id
     private Long id;
     private String country;
     private LocalDate date;
