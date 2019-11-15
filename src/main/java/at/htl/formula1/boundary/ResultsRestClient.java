@@ -10,6 +10,7 @@ import javax.json.JsonValue;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
+import javax.ws.rs.GET;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
@@ -27,11 +28,18 @@ public class ResultsRestClient {
      * Vom RestEndpoint werden alle Result abgeholt und in ein JsonArray gespeichert.
      * Dieses JsonArray wird an die Methode persistResult(...) übergeben
      */
+
     public void readResultsFromEndpoint() {
+        client = ClientBuilder.newClient();
+        target = client.target(RESULTS_ENDPOINT);
 
         JsonArray payload = null;
+        Response res = this.target.request(MediaType.APPLICATION_JSON).get();
+        payload = res.readEntity(JsonArray.class);
 
-        persistResult(payload);
+        //System.out.println(payload.getJsonObject(0));
+
+        //persistResult(payload);
     }
 
     /**
