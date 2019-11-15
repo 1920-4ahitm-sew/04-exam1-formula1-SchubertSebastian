@@ -13,6 +13,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Transient;
 import javax.transaction.Transactional;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -27,6 +28,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.stream.Stream;
 
+import static java.lang.Integer.parseInt;
+import static java.time.LocalDate.parse;
+
 @ApplicationScoped
 public class InitBean {
 
@@ -39,7 +43,7 @@ public class InitBean {
     @Inject
     ResultsRestClient client;
 
-
+    @Transient
     public void init(@Observes @Initialized(ApplicationScoped.class) Object init) {
 
         readTeamsAndDriversFromFile(TEAM_FILE_NAME);
@@ -53,8 +57,11 @@ public class InitBean {
      *
      * @param racesFileName
      */
+    @Transient
     private void readRacesFromFile(String racesFileName) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d.MM.yyyy");
         try {
+
             BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream( "/"+racesFileName)));
             br.readLine();
             String line;
@@ -64,13 +71,17 @@ public class InitBean {
 
                 String[] arr= line.split(delim);
 
-                System.out.println(arr[0]);
+                System.out.println("0: " + arr[0]);
                 System.out.println(arr[1]);
                 System.out.println(arr[2]);
 
-                //em.persist(new Race(Long.parseLong(arr[0]),arr[1], LocalDate.parse(arr[2])));
 
-                //Race race = new Race(Long.parseLong(arr[0]),arr[1], LocalDate.parse(arr[2]));
+
+                LocalDate localDate = LocalDate.parse(arr[2], formatter);
+                Race race = new Race(Long.parseLong(arr[0]),arr[1], localDate);
+
+                em.persist(race);
+                //em.persist(new Race(Long.parseLong(arr[0]),arr[1], localDate));
                 //System.out.println(race);
             }
         } catch (FileNotFoundException e) {
@@ -105,7 +116,7 @@ public class InitBean {
 
                 //em.persist(new Race(Long.parseLong(arr[0]),arr[1], LocalDate.parse(arr[2])));
 
-                //Race race = new Race(Long.parseLong(arr[0]),arr[1], LocalDate.parse(arr[2]));
+                //Driver race = new Driver(arr[1],Integer.getInteger(arr[2]));
                 //System.out.println(race);
             }
         } catch (FileNotFoundException e) {
